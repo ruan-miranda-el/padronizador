@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padronizador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: Arial, sans-serif;
+        }
+
+        .script-container {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .script-container input {
+            flex: 1;
+        }
+
+        .btn-remove {
+            background-color: #dc3545;
+            color: white;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            font-size: 16px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .btn-remove:hover {
+            background-color: #c82333;
+        }
+
+        .repo-group {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+
+        .repo-group select {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .repo-group input {
+            width: 100%;
+        }
+
+        .repo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .repo-header select {
+            flex: 1;
+            margin-bottom: 0;
+            margin-right: 10px;
+        }
+
+        .repo-group .btn-remove {
+            width: 30px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .error {
+            border-color: #dc3545 !important;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .modal-header h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: #555;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .repo-commit {
+            margin-bottom: 15px;
+        }
+
+        .repo-commit h4 {
+            color: #007bff;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .message-box {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            padding-top: 15px;
+            border-top: 2px solid #ddd;
+        }
+
+        .btn-copy {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background-color: #138496;
+        }
+
+        .btn-close {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-close:hover {
+            background-color: #545b62;
+        }
+
+        .relatorios-section {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .relatorios-section.show {
+            display: block;
+        }
+
+        .relatorio-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .relatorio-item input[type="text"] {
+            flex: 1;
+        }
+
+        .relatorio-item .checkbox-group {
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .relatorio-item .btn-remove {
+            width: 30px;
+            height: 38px;
+            flex-shrink: 0;
+        }
+
+        .btn-add-relatorio {
+            background-color: #17a2b8;
+            color: white;
+            padding: 8px 16px;
+            margin-top: 10px;
+        }
+
+        .btn-add-relatorio:hover {
+            background-color: #138496;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Padronizador</h1>
+        
+        <button class="btn-danger" onclick="limparTudo()">Limpar Tudo</button>
+
+        <div class="form-group">
+            <label for="processo">Processo *</label>
+            <input type="text" id="processo" placeholder="000000/0000" maxlength="11">
+            <div id="processoError" class="error-message"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Script</label>
+            <div id="scriptsContainer">
+                <div class="script-container">
+                    <input type="text" class="script-input" placeholder="Digite o script">
+                </div>
+            </div>
+            <button class="btn-secondary" style="margin-top: 10px;" onclick="adicionarScript()">Adicionar novo script</button>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="retrabalho">
+                <label for="retrabalho" style="margin-bottom: 0;">Retrabalho</label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Repositório e Resumo</label>
+            <div id="repositoriosContainer">
+                <div class="repo-group">
+                    <select class="repositorio-select" onchange="toggleRelatorios(this)">
+                        <option value="">Selecione...</option>
+                        <option value="cpe-jdk-basecontabil">cpe-jdk-basecontabil</option>
+                        <option value="cpe-jdk-contacorrente">cpe-jdk-contacorrente</option>
+                        <option value="cpe-jdk-cpebase">cpe-jdk-cpebase</option>
+                        <option value="cpe-jdk-cpedicionario">cpe-jdk-cpedicionario</option>
+                        <option value="cpe-jdk-cpeintegracaorhf">cpe-jdk-cpeintegracaorhf</option>
+                        <option value="cpe-jdk-cperelatorios">cpe-jdk-cperelatorios</option>
+                        <option value="cpe-jdk-execucao">cpe-jdk-execucao</option>
+                        <option value="cpe-jdk-lrf">cpe-jdk-lrf</option>
+                        <option value="cpe-jdk-orcamento">cpe-jdk-orcamento</option>
+                        <option value="cpe-jdk-planejamento">cpe-jdk-planejamento</option>
+                        <option value="cpe-jdk-prestacaocontas">cpe-jdk-prestacaocontas</option>
+                        <option value="cpe-jdk-reinf">cpe-jdk-reinf</option>
+                        <option value="cpe-jdk-relatorios">cpe-jdk-relatorios</option>
+                        <option value="cpe-jdk-sicom">cpe-jdk-sicom</option>
+                        <option value="cpe-jdk-versaobanco">cpe-jdk-versaobanco</option>
+                        <option value="eps-jdk-gpi">eps-jdk-gpi</option>
+                    </select>
+                    <input type="text" class="resumo-input" placeholder="Resumo da alteração">
+                    <div class="relatorios-section">
+                        <div class="relatorios-container">
+                            <div class="relatorio-item">
+                                <input type="text" class="relatorio-nome" placeholder="Nome do relatório">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" class="relatorio-prod">
+                                    <label style="margin-bottom: 0;">Atualizado em produção</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-add-relatorio" type="button" onclick="adicionarRelatorio(this)">Adicionar relatório</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-secondary" style="margin-top: 10px;" onclick="adicionarRepositorio()">Adicionar repositório</button>
+        </div>
+
+        <div class="form-group">
+            <label for="detalhamento">Detalhamento da Alteração</label>
+            <textarea id="detalhamento" placeholder="Descreva em detalhes a alteração realizada..."></textarea>
+        </div>
+
+        <button class="btn-success" onclick="finalizar()">Finalizar</button>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Mensagens Geradas</h2>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>Mensagens de Commit</h3>
+                    <div id="mensagensCommitContainer"></div>
+                </div>
+                <div class="modal-section">
+                    <h3>Resposta de Protocolo</h3>
+                    <div class="message-box" id="mensagemProtocolo"></div>
+                    <button class="btn-copy" style="margin-top: 10px;" onclick="copiarTexto('mensagemProtocolo')">Copiar</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-close" onclick="fecharModal()">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const processoInput = document.getElementById('processo');
+
+        processoInput.addEventListener('input', function(e) {
+            let valor = e.target.value.replace(/\D/g, '');
+            
+            if (valor.length > 10) {
+                valor = valor.substring(0, 10);
+            }
+            
+            if (valor.length > 6) {
+                const parte1 = valor.substring(0, 6).padStart(6, '0');
+                const parte2 = valor.substring(6, 10);
+                e.target.value = parte1 + '/' + parte2;
+            } else if (valor.length > 0) {
+                e.target.value = valor;
+            } else {
+                e.target.value = '';
+            }
+            
+            document.getElementById('processoError').textContent = '';
+            processoInput.classList.remove('error');
+        });
+
+        function adicionarScript() {
+            const container = document.getElementById('scriptsContainer');
+            const novoScript = document.createElement('div');
+            novoScript.className = 'script-container';
+            novoScript.innerHTML = `
+                <input type="text" class="script-input" placeholder="Digite o script">
+                <button class="btn-remove" onclick="removerScript(this)" title="Remover script">×</button>
+            `;
+            container.appendChild(novoScript);
+        }
+
+        function removerScript(botao) {
+            const container = botao.parentElement;
+            container.remove();
+        }
+
+        function adicionarRepositorio() {
+            const container = document.getElementById('repositoriosContainer');
+            const novoRepo = document.createElement('div');
+            novoRepo.className = 'repo-group';
+            novoRepo.innerHTML = `
+                <div class="repo-header">
+                    <select class="repositorio-select" onchange="toggleRelatorios(this)">
+                        <option value="">Selecione...</option>
+                        <option value="cpe-jdk-basecontabil">cpe-jdk-basecontabil</option>
+                        <option value="cpe-jdk-contacorrente">cpe-jdk-contacorrente</option>
+                        <option value="cpe-jdk-cpebase">cpe-jdk-cpebase</option>
+                        <option value="cpe-jdk-cpedicionario">cpe-jdk-cpedicionario</option>
+                        <option value="cpe-jdk-cpeintegracaorhf">cpe-jdk-cpeintegracaorhf</option>
+                        <option value="cpe-jdk-cperelatorios">cpe-jdk-cperelatorios</option>
+                        <option value="cpe-jdk-execucao">cpe-jdk-execucao</option>
+                        <option value="cpe-jdk-lrf">cpe-jdk-lrf</option>
+                        <option value="cpe-jdk-orcamento">cpe-jdk-orcamento</option>
+                        <option value="cpe-jdk-planejamento">cpe-jdk-planejamento</option>
+                        <option value="cpe-jdk-prestacaocontas">cpe-jdk-prestacaocontas</option>
+                        <option value="cpe-jdk-reinf">cpe-jdk-reinf</option>
+                        <option value="cpe-jdk-relatorios">cpe-jdk-relatorios</option>
+                        <option value="cpe-jdk-sicom">cpe-jdk-sicom</option>
+                        <option value="cpe-jdk-versaobanco">cpe-jdk-versaobanco</option>
+                        <option value="eps-jdk-gpi">eps-jdk-gpi</option>
+                    </select>
+                    <button class="btn-remove" onclick="removerRepositorio(this)" title="Remover repositório">×</button>
+                </div>
+                <input type="text" class="resumo-input" placeholder="Resumo da alteração">
+                <div class="relatorios-section">
+                    <div class="relatorios-container">
+                        <div class="relatorio-item">
+                            <input type="text" class="relatorio-nome" placeholder="Nome do relatório">
+                            <div class="checkbox-group">
+                                <input type="checkbox" class="relatorio-prod">
+                                <label style="margin-bottom: 0;">Atualizado em produção</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-add-relatorio" type="button" onclick="adicionarRelatorio(this)">Adicionar relatório</button>
+                </div>
+            `;
+            container.appendChild(novoRepo);
+        }
+
+        function removerRepositorio(botao) {
+            const repoGroup = botao.closest('.repo-group');
+            repoGroup.remove();
+        }
+
+        function toggleRelatorios(selectElement) {
+            const repoGroup = selectElement.closest('.repo-group');
+            const relatoriosSection = repoGroup.querySelector('.relatorios-section');
+            
+            if (selectElement.value === 'cpe-jdk-relatorios') {
+                relatoriosSection.classList.add('show');
+            } else {
+                relatoriosSection.classList.remove('show');
+            }
+        }
+
+        function adicionarRelatorio(botao) {
+            const relatoriosContainer = botao.previousElementSibling;
+            const novoRelatorio = document.createElement('div');
+            novoRelatorio.className = 'relatorio-item';
+            novoRelatorio.innerHTML = `
+                <input type="text" class="relatorio-nome" placeholder="Nome do relatório">
+                <div class="checkbox-group">
+                    <input type="checkbox" class="relatorio-prod">
+                    <label style="margin-bottom: 0;">Atualizado em produção</label>
+                </div>
+                <button class="btn-remove" onclick="removerRelatorio(this)" title="Remover relatório">×</button>
+            `;
+            relatoriosContainer.appendChild(novoRelatorio);
+        }
+
+        function removerRelatorio(botao) {
+            const relatorioItem = botao.closest('.relatorio-item');
+            relatorioItem.remove();
+        }
+
+        function limparTudo() {
+            document.getElementById('processo').value = '';
+            document.getElementById('processoError').textContent = '';
+            document.getElementById('processo').classList.remove('error');
+            
+            const scriptsContainer = document.getElementById('scriptsContainer');
+            scriptsContainer.innerHTML = '<div class="script-container"><input type="text" class="script-input" placeholder="Digite o script"></div>';
+            
+            document.getElementById('retrabalho').checked = false;
+            
+            const repositoriosContainer = document.getElementById('repositoriosContainer');
+            repositoriosContainer.innerHTML = `
+                <div class="repo-group">
+                    <select class="repositorio-select" onchange="toggleRelatorios(this)">
+                        <option value="">Selecione...</option>
+                        <option value="cpe-jdk-basecontabil">cpe-jdk-basecontabil</option>
+                        <option value="cpe-jdk-contacorrente">cpe-jdk-contacorrente</option>
+                        <option value="cpe-jdk-cpebase">cpe-jdk-cpebase</option>
+                        <option value="cpe-jdk-cpedicionario">cpe-jdk-cpedicionario</option>
+                        <option value="cpe-jdk-cpeintegracaorhf">cpe-jdk-cpeintegracaorhf</option>
+                        <option value="cpe-jdk-cperelatorios">cpe-jdk-cperelatorios</option>
+                        <option value="cpe-jdk-execucao">cpe-jdk-execucao</option>
+                        <option value="cpe-jdk-lrf">cpe-jdk-lrf</option>
+                        <option value="cpe-jdk-orcamento">cpe-jdk-orcamento</option>
+                        <option value="cpe-jdk-planejamento">cpe-jdk-planejamento</option>
+                        <option value="cpe-jdk-prestacaocontas">cpe-jdk-prestacaocontas</option>
+                        <option value="cpe-jdk-reinf">cpe-jdk-reinf</option>
+                        <option value="cpe-jdk-relatorios">cpe-jdk-relatorios</option>
+                        <option value="cpe-jdk-sicom">cpe-jdk-sicom</option>
+                        <option value="cpe-jdk-versaobanco">cpe-jdk-versaobanco</option>
+                        <option value="eps-jdk-gpi">eps-jdk-gpi</option>
+                    </select>
+                    <input type="text" class="resumo-input" placeholder="Resumo da alteração">
+                    <div class="relatorios-section">
+                        <div class="relatorios-container">
+                            <div class="relatorio-item">
+                                <input type="text" class="relatorio-nome" placeholder="Nome do relatório">
+                                <div class="checkbox-group">
+                                    <input type="checkbox" class="relatorio-prod">
+                                    <label style="margin-bottom: 0;">Atualizado em produção</label>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-add-relatorio" type="button" onclick="adicionarRelatorio(this)">Adicionar relatório</button>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('detalhamento').value = '';
+        }
+
+        function validarProcesso() {
+            const processo = document.getElementById('processo').value;
+            const processoError = document.getElementById('processoError');
+            const processoInput = document.getElementById('processo');
+            
+            if (!processo) {
+                processoError.textContent = 'O campo Processo é obrigatório';
+                processoInput.classList.add('error');
+                return false;
+            }
+            
+            const regex = /^\d{6}\/\d{4}$/;
+            if (!regex.test(processo)) {
+                processoError.textContent = 'Formato inválido. Use o formato 000000/0000';
+                processoInput.classList.add('error');
+                return false;
+            }
+            
+            processoError.textContent = '';
+            processoInput.classList.remove('error');
+            return true;
+        }
+
+        function finalizar() {
+            if (!validarProcesso()) {
+                alert('Por favor, preencha o campo Processo corretamente.');
+                return;
+            }
+            
+            const processo = document.getElementById('processo').value;
+            const retrabalho = document.getElementById('retrabalho').checked;
+            const detalhamento = document.getElementById('detalhamento').value.trim();
+            
+            const scriptInputs = document.querySelectorAll('.script-input');
+            const scripts = Array.from(scriptInputs)
+                .map(input => input.value.trim())
+                .filter(script => script !== '');
+            
+            const repoGroups = document.querySelectorAll('.repo-group');
+            const repositorios = Array.from(repoGroups).map(group => {
+                const select = group.querySelector('.repositorio-select');
+                const input = group.querySelector('.resumo-input');
+                
+                // Coletar informações dos relatórios se o repositório for cpe-jdk-relatorios
+                let relatorios = [];
+                if (select.value === 'cpe-jdk-relatorios') {
+                    const relatorioItems = group.querySelectorAll('.relatorio-item');
+                    relatorios = Array.from(relatorioItems).map(item => {
+                        const nome = item.querySelector('.relatorio-nome').value.trim();
+                        const prod = item.querySelector('.relatorio-prod').checked;
+                        return { nome, prod };
+                    }).filter(rel => rel.nome !== '');
+                }
+                
+                return {
+                    repositorio: select.value,
+                    resumo: input.value.trim(),
+                    relatorios: relatorios
+                };
+            }).filter(repo => repo.repositorio && repo.resumo);
+            
+            // Gerar mensagens de commit
+            const container = document.getElementById('mensagensCommitContainer');
+            container.innerHTML = '';
+            
+            const commits = [];
+            
+            if (repositorios.length === 0) {
+                let msg = '';
+                if (retrabalho) msg += '[RETRABALHO] ';
+                msg += processo;
+                if (scripts.length > 0) msg += ' [SCRIPT]';
+                commits.push({ repositorio: null, mensagem: msg });
+                
+                const repoCommitDiv = document.createElement('div');
+                repoCommitDiv.className = 'repo-commit';
+                repoCommitDiv.innerHTML = `
+                    <div class="message-box">${msg}</div>
+                    <button class="btn-copy" style="margin-top: 10px;" onclick="copiarTextoElemento(this.previousElementSibling)">Copiar</button>
+                `;
+                container.appendChild(repoCommitDiv);
+            } else {
+                repositorios.forEach((repo) => {
+                    let msg = '';
+                    if (retrabalho) msg += '[RETRABALHO] ';
+                    msg += processo;
+                    if (scripts.length > 0) msg += ' [SCRIPT]';
+                    msg += ' - ' + repo.resumo;
+                    commits.push({ repositorio: repo.repositorio, mensagem: msg });
+                    
+                    const repoCommitDiv = document.createElement('div');
+                    repoCommitDiv.className = 'repo-commit';
+                    repoCommitDiv.innerHTML = `
+                        <h4>Repositório: ${repo.repositorio}</h4>
+                        <div class="message-box">${msg}</div>
+                        <button class="btn-copy" style="margin-top: 10px;" onclick="copiarTextoElemento(this.previousElementSibling)">Copiar</button>
+                    `;
+                    container.appendChild(repoCommitDiv);
+                });
+            }
+            
+            // Gerar resposta de protocolo
+            let respostaProtocolo = 'Commits:\n';
+            commits.forEach((commit, index) => {
+                if (commit.repositorio) {
+                    respostaProtocolo += commit.repositorio + ': ' + commit.mensagem;
+                } else {
+                    respostaProtocolo += commit.mensagem;
+                }
+                if (index < commits.length - 1) {
+                    respostaProtocolo += '\n';
+                }
+            });
+            
+            if (scripts.length > 0) {
+                respostaProtocolo += '\n\nScripts:\n';
+                scripts.forEach((script, index) => {
+                    respostaProtocolo += script;
+                    if (index < scripts.length - 1) {
+                        respostaProtocolo += '\n';
+                    }
+                });
+            }
+            
+            // Adicionar relatórios se houver
+            const todosRelatorios = repositorios
+                .filter(repo => repo.relatorios && repo.relatorios.length > 0)
+                .flatMap(repo => repo.relatorios);
+            
+            if (todosRelatorios.length > 0) {
+                respostaProtocolo += '\n\nRelatórios:\n';
+                todosRelatorios.forEach((relatorio, index) => {
+                    respostaProtocolo += relatorio.nome;
+                    if (relatorio.prod) {
+                        respostaProtocolo += ' (Atualizado em produção)';
+                    }
+                    if (index < todosRelatorios.length - 1) {
+                        respostaProtocolo += '\n';
+                    }
+                });
+            }
+            
+            if (detalhamento) {
+                respostaProtocolo += '\n\nDetalhamento da Alteração:\n';
+                respostaProtocolo += detalhamento;
+            }
+            
+            document.getElementById('mensagemProtocolo').textContent = respostaProtocolo;
+            
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function copiarTexto(elementId) {
+            const texto = document.getElementById(elementId).textContent;
+            const botao = event.target;
+            
+            navigator.clipboard.writeText(texto).then(() => {
+                const textoOriginal = botao.textContent;
+                const corOriginal = botao.style.backgroundColor;
+                
+                botao.textContent = '✓ Copiado!';
+                botao.style.backgroundColor = '#28a745';
+                botao.disabled = true;
+                
+                setTimeout(() => {
+                    botao.textContent = textoOriginal;
+                    botao.style.backgroundColor = corOriginal;
+                    botao.disabled = false;
+                }, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar texto:', err);
+                alert('Erro ao copiar texto. Tente novamente.');
+            });
+        }
+        
+        function copiarTextoElemento(elemento) {
+            const texto = elemento.textContent;
+            const botao = event.target;
+            
+            navigator.clipboard.writeText(texto).then(() => {
+                const textoOriginal = botao.textContent;
+                const corOriginal = botao.style.backgroundColor;
+                
+                botao.textContent = '✓ Copiado!';
+                botao.style.backgroundColor = '#28a745';
+                botao.disabled = true;
+                
+                setTimeout(() => {
+                    botao.textContent = textoOriginal;
+                    botao.style.backgroundColor = corOriginal;
+                    botao.disabled = false;
+                }, 2000);
+            }).catch(err => {
+                console.error('Erro ao copiar texto:', err);
+                alert('Erro ao copiar texto. Tente novamente.');
+            });
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                fecharModal();
+            }
+        }
+    </script>
+</body>
+</html>
