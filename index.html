@@ -678,10 +678,10 @@
             const commits = [];
             
             if (repositorios.length === 0) {
-                let msg = '';
-                if (retrabalho) msg += '[RETRABALHO] ';
-                msg += processo;
+                let msg = processo;
+                if (retrabalho) msg += ' [RETRABALHO]';
                 if (scripts.length > 0) msg += ' [SCRIPT]';
+                msg += ' - ' + repo.resumo;
                 commits.push({ repositorio: null, mensagem: msg });
                 
                 const repoCommitDiv = document.createElement('div');
@@ -693,9 +693,8 @@
                 container.appendChild(repoCommitDiv);
             } else {
                 repositorios.forEach((repo) => {
-                    let msg = '';
-                    if (retrabalho) msg += '[RETRABALHO] ';
-                    msg += processo;
+                    let msg = processo;
+                    if (retrabalho) msg += ' [RETRABALHO]';
                     if (scripts.length > 0) msg += ' [SCRIPT]';
                     msg += ' - ' + repo.resumo;
                     commits.push({ repositorio: repo.repositorio, mensagem: msg });
